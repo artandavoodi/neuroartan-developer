@@ -1,4 +1,4 @@
-import { PLATFORM_ORIGIN, SUPABASE_CONFIG, platformAsset } from './platform.js';
+import { PLATFORM_ORIGIN, SUPABASE_CONFIG, getPlatformSignInUrl, platformAsset } from './platform.js';
 import { getSupabaseClient } from './supabase.js';
 import { issueDeveloperApiKey, readDeveloperApiKeys, revokeDeveloperApiKey } from './api-keys.js';
 
@@ -34,6 +34,15 @@ function icon(path) {
   return `<img class="developer-console__nav-icon ui-icon-theme-aware" src="${platformAsset(`/registry/icons/public/assets/${path}`)}" alt="">`;
 }
 
+function escapeHtml(value = '') {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
 async function renderNav() {
   const response = await fetch('/assets/data/console-nav.json', { cache: 'no-store' });
   const registry = await response.json();
@@ -48,11 +57,11 @@ async function renderNav() {
 function renderAccount() {
   const target = document.querySelector('[data-developer-account]');
   if (!state.user) {
-    target.innerHTML = `<a class="developer-console__text-action" href="${platformAsset('/')}" data-developer-sign-in>Sign in</a>`;
+    target.innerHTML = `<a class="developer-console__text-action" href="${getPlatformSignInUrl()}" data-developer-sign-in>Sign in</a>`;
     return;
   }
   const profileName = state.profile?.username ? `@${state.profile.username}` : state.user.email || 'Authenticated';
-  target.innerHTML = `<span class="developer-console__signed-in">${icon('core/identity/profile/profile.svg')}<span>Signed in as ${profileName}</span></span><button class="developer-console__text-action" type="button" data-developer-sign-out>Sign out</button>`;
+  target.innerHTML = `<span class="developer-console__signed-in">${icon('core/identity/profile/profile.svg')}<span>Signed in as ${escapeHtml(profileName)}</span></span><button class="developer-console__text-action" type="button" data-developer-sign-out>Sign out</button>`;
 }
 
 function formatTier(tier) {
@@ -62,17 +71,19 @@ function formatTier(tier) {
 function renderAccountSummary() {
   const target = document.querySelector('[data-developer-account-summary]');
   if (!state.user) {
-    target.innerHTML = `<a class="developer-console__account-sign-in" href="${platformAsset('/')}" data-developer-sign-in>${icon('core/identity/account/account.svg')}<span>Sign in to manage API access</span></a>`;
+    target.innerHTML = `<a class="developer-console__account-sign-in" href="${getPlatformSignInUrl()}" data-developer-sign-in>${icon('core/identity/account/account.svg')}<span>Sign in to manage API access</span></a>`;
     return;
   }
 
   const profileName = state.profile?.display_name || state.profile?.username || state.user.email || 'Authenticated';
   const profileId = state.profile?.id || state.user.id;
+  const accountId = state.user.id;
   target.innerHTML = `
     <div class="developer-console__account-heading">${icon('core/identity/account/account.svg')}<span>Account</span></div>
-    <strong>${profileName}</strong>
-    ${state.profile?.username ? `<span class="developer-console__account-handle">@${state.profile.username}</span>` : ''}
-    <span class="developer-console__account-id" title="${profileId}">Profile ${profileId.slice(0, 8)}</span>
+    <strong>${escapeHtml(profileName)}</strong>
+    ${state.profile?.username ? `<span class="developer-console__account-handle">@${escapeHtml(state.profile.username)}</span>` : ''}
+    <span class="developer-console__account-id" title="${escapeHtml(profileId)}">Profile ${escapeHtml(profileId.slice(0, 8))}</span>
+    <span class="developer-console__account-id" title="${escapeHtml(accountId)}">Account ${escapeHtml(accountId.slice(0, 8))}</span>
     <div class="developer-console__account-tier">${icon('core/commerce/subscriptions/subscription.svg')}<span>${formatTier(state.entitlement?.subscription_tier)}</span></div>
   `;
 }
@@ -86,7 +97,7 @@ function renderSummary() {
   const active = state.keys.filter((key) => key.status === 'active');
   target.innerHTML = `
     <div class="developer-console__summary-row"><span>Active API keys</span><strong>${active.length}</strong></div>
-    <div class="developer-console__summary-row"><span>Canonical profile</span><strong>${state.profile?.username ? `@${state.profile.username}` : 'Available'}</strong></div>
+    <div class="developer-console__summary-row"><span>Canonical profile</span><strong>${state.profile?.username ? `@${escapeHtml(state.profile.username)}` : 'Available'}</strong></div>
     <div class="developer-console__summary-row"><span>Subscription</span><strong>${formatTier(state.entitlement?.subscription_tier)}</strong></div>
     <div class="developer-console__summary-row"><span>Gateway</span><code>${SUPABASE_CONFIG.url}/functions/v1/developer-api-gateway/v1/models/current</code></div>
   `;
@@ -105,8 +116,8 @@ function renderKeys() {
   target.innerHTML = state.keys.map((key) => `
     <article class="developer-console__key-row">
       <div class="developer-console__key-meta">
-        <strong>${key.label}</strong>
-        <span>${key.key_prefix}... · ${key.environment} · ${key.rate_limit_per_minute}/min · ${key.status}</span>
+        <strong>${escapeHtml(key.label)}</strong>
+        <span>${escapeHtml(key.key_prefix)}... · ${escapeHtml(key.environment)} · ${escapeHtml(key.rate_limit_per_minute)}/min · ${escapeHtml(key.status)}</span>
       </div>
       ${key.status === 'active' ? `<button class="developer-console__text-action" type="button" data-developer-key-revoke="${key.id}">Revoke</button>` : ''}
     </article>
@@ -168,7 +179,8 @@ async function issueKey(form) {
     const values = Object.fromEntries(new FormData(form).entries());
     const key = await issueDeveloperApiKey(values);
     result.hidden = false;
-    result.innerHTML = `<strong>Copy this key now. It will not be shown again.</strong><code>${key.secret}</code><button class="developer-console__text-action" type="button" data-developer-secret-copy="${key.secret}">Copy</button>`;
+    const secret = escapeHtml(key.secret);
+    result.innerHTML = `<strong>Copy this key now. It will not be shown again.</strong><code>${secret}</code><button class="developer-console__text-action" type="button" data-developer-secret-copy="${secret}">Copy</button>`;
     state.keys = await readDeveloperApiKeys();
     renderSummary();
     renderKeys();

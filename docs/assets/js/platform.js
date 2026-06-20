@@ -13,6 +13,14 @@ export function platformAsset(path = '') {
   return `${PLATFORM_ORIGIN}${String(path || '').startsWith('/') ? path : `/${path}`}`;
 }
 
+export function getPlatformSignInUrl() {
+  const returnTo = `${window.location.origin}${window.location.pathname}${window.location.search}${window.location.hash}`;
+  const url = new URL(platformAsset('/'));
+  url.searchParams.set('account', 'sign-in');
+  url.searchParams.set('return_to', returnTo);
+  return url.toString();
+}
+
 export function createSharedAuthStorage() {
   const hostname = String(window.location.hostname || '').toLowerCase();
   const shareAcrossOrigins = hostname === 'neuroartan.com'

@@ -42,6 +42,14 @@ button { color: inherit; }
 .developer-console__nav { padding-block: var(--spacing-lg); }
 .developer-console__nav-item { width: 100%; display: flex; align-items: center; gap: var(--spacing-sm); padding: var(--spacing-sm) var(--spacing-lg); color: var(--text-secondary-color); background: transparent; border: 0; text-align: left; cursor: pointer; }
 .developer-console__nav-item[aria-current="page"] { color: var(--text-primary-color); }
+.developer-console__nav-item:hover,
+.developer-console__nav-item:focus-visible,
+.developer-console__text-action:hover,
+.developer-console__text-action:focus-visible,
+.developer-console__command:hover,
+.developer-console__command:focus-visible,
+.developer-console__account-sign-in:hover,
+.developer-console__account-sign-in:focus-visible { color: inherit; background: transparent; transform: none; }
 .developer-console__nav-icon { inline-size: 1rem; block-size: 1rem; object-fit: contain; }
 .developer-console__account-summary { display: grid; gap: var(--spacing-xs); margin-top: auto; padding: var(--spacing-lg); color: var(--text-secondary-color); }
 .developer-console__account-heading, .developer-console__account-tier, .developer-console__account-sign-in { display: inline-flex; align-items: center; gap: var(--spacing-xs); }
