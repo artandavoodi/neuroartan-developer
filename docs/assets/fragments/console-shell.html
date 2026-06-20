@@ -1,0 +1,66 @@
+<section class="developer-console" data-developer-console>
+  <header class="developer-console__topbar">
+    <a class="developer-console__brand" href="https://neuroartan.com" aria-label="Neuroartan home">Neuroartan</a>
+    <span class="developer-console__title">Developer</span>
+    <div class="developer-console__account" data-developer-account></div>
+  </header>
+  <div class="developer-console__layout">
+    <aside class="developer-console__sidebar" aria-label="Developer console navigation">
+      <nav class="developer-console__nav" data-developer-nav aria-label="Developer console"></nav>
+      <section class="developer-console__account-summary" data-developer-account-summary></section>
+    </aside>
+    <section class="developer-console__main" data-developer-main>
+      <section class="developer-console__section" data-developer-panel="overview">
+        <header class="developer-console__section-header">
+          <h1>API access</h1>
+          <p>Issue, scope, and revoke access for your canonical model.</p>
+        </header>
+        <div class="developer-console__summary" data-developer-summary></div>
+      </section>
+      <section class="developer-console__section" data-developer-panel="api-keys" hidden>
+        <header class="developer-console__section-header developer-console__section-header--action">
+          <div>
+            <h1>API keys</h1>
+            <p>Keys are shown once when issued. Only the server retains their hashes.</p>
+          </div>
+          <button class="developer-console__command" type="button" data-developer-issue-open>Issue key</button>
+        </header>
+        <div class="developer-console__key-list" data-developer-key-list></div>
+      </section>
+      <section class="developer-console__section" data-developer-panel="usage" hidden>
+        <header class="developer-console__section-header">
+          <h1>Usage</h1>
+          <p>Request volume, latency, and metering will appear after API traffic is recorded.</p>
+        </header>
+        <div class="developer-console__empty" data-developer-usage>Usage is available per API key through the gateway.</div>
+      </section>
+      <section class="developer-console__section" data-developer-panel="billing" hidden>
+        <header class="developer-console__section-header">
+          <h1>Billing</h1>
+          <p>Usage caps are enforced per key. Provider billing integration remains server-managed.</p>
+        </header>
+        <div class="developer-console__empty">No billable usage has been recorded.</div>
+      </section>
+    </section>
+  </div>
+  <section class="developer-console__overlay" data-developer-key-dialog hidden aria-hidden="true">
+    <div class="developer-console__overlay-backdrop" data-developer-key-close></div>
+    <article class="developer-console__dialog" role="dialog" aria-modal="true" aria-labelledby="developer-key-title">
+      <header class="developer-console__dialog-header">
+        <h2 id="developer-key-title">Issue API key</h2>
+        <button class="global-close-button" type="button" data-developer-key-close aria-label="Close">
+          <span class="global-close-button__line global-close-button__line--first" aria-hidden="true"></span>
+          <span class="global-close-button__line global-close-button__line--second" aria-hidden="true"></span>
+        </button>
+      </header>
+      <form class="developer-console__form" data-developer-key-form>
+        <label><span>Label</span><input name="label" required maxlength="80" value="Default key"></label>
+        <label><span>Environment</span><select name="environment"><option value="live">Live</option><option value="test">Test</option></select></label>
+        <label><span>Rate limit per minute</span><input name="rateLimitPerMinute" type="number" min="1" max="10000" value="60"></label>
+        <label><span>Scope</span><select name="scope"><option value="models.read">Model read</option></select></label>
+        <button class="developer-console__command" type="submit">Issue key</button>
+      </form>
+      <section class="developer-console__secret" data-developer-secret-result hidden></section>
+    </article>
+  </section>
+</section>

@@ -1,0 +1,8 @@
+{
+  "items": [
+    { "id": "overview", "label": "Overview", "icon": "core/navigation/home/home.svg" },
+    { "id": "api-keys", "label": "API keys", "icon": "layers/software/api/api.svg" },
+    { "id": "usage", "label": "Usage", "icon": "core/actions/scan/scan.svg" },
+    { "id": "billing", "label": "Billing", "icon": "core/actions/info/info.svg" }
+  ]
+}
